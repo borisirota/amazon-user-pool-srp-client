@@ -78,7 +78,7 @@ SRPClient.prototype = {
   },
   padHex: function (bigInt) {
     var hashStr = bigInt.toString(16)
-    if (hashStr.length % 2 === 1) hashStr = `0${hashStr}`
+    if (hashStr.length % 2 === 1) hashStr = '0' + hashStr
     else if ('89ABCDEFabcdef'.indexOf(hashStr[0]) !== -1) hashStr = '00' + hashStr
     return hashStr
   },
