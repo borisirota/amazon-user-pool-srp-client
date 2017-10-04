@@ -77,7 +77,7 @@ SRPClient.prototype = {
     return hkdf
   },
   padHex: function (bigInt) {
-    let hashStr = bigInt.toString(16)
+    var hashStr = bigInt.toString(16)
     if (hashStr.length % 2 === 1) hashStr = `0${hashStr}`
     else if ('89ABCDEFabcdef'.indexOf(hashStr[0]) !== -1) hashStr = '00' + hashStr
     return hashStr

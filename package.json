@@ -1,6 +1,6 @@
 {
   "name": "amazon-user-pool-srp-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "standalone srp client for amazon user pool service",
   "main": "index.js",
   "author": "Boris Sirota <borisirota@gmail.com> (https://github.com/borisirota)",
