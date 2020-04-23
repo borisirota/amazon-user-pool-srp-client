@@ -221,7 +221,7 @@ function bnpClamp() {
 
 // (public) return string representation in given radix
 function bnToString(b) {
-  if (this.s < 0) return "-" + this.negate().toString();
+  if (this.s < 0) return "-" + this.negate().toString(b);
   var k;
   if (b == 16) k = 4;
   else if (b == 8) k = 3;
