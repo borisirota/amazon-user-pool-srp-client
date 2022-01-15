@@ -91,10 +91,38 @@ SRPClient.prototype = {
   },
   computehkdf: function (ikm, salt) {
     return sjcl.misc.hkdf(sjcl.codec.hex.toBits(ikm), 128, sjcl.codec.hex.toBits(salt), this.infoBits)
+  },
+  /**
+* Generate salts and compute verifier.
+* @param {string} deviceGroupKey Devices to generate verifier for.
+* @param {string} username User to generate verifier for.
+* return DeviceSecretVerifierConfig {
+  PasswordVerifier: base64 encoded passwordVerifier
+  Salt: base64 enocoded salt
+}
+*/
+  generateDeviceVerifierConfig: function (deviceGroupKey, username) {
+
+    const randomPassword = sjcl.codec.base64.fromBits(sjcl.random.randomWords(8, 10), 0);
+    const combinedString = `${deviceGroupKey}${username}:${randomPassword}`;
+    const hashedString = this.hash(combinedString);
+
+    const hexRandom = new BigInteger(sjcl.codec.hex.fromBits(sjcl.random.randomWords(8, 0)), 16);
+    const SaltToHashDevices = this.padHex(hexRandom);
+    const deviceVerifier = this.g.modPow(
+      new BigInteger(this.hexHash(SaltToHashDevices + hashedString), 16),
+      this.N
+    );
+    const base64PasswordVerifier = sjcl.codec.base64.fromBits(sjcl.codec.utf8String.toBits(deviceVerifier.toString(16)));
+    const base64Salt = sjcl.codec.base64.fromBits(sjcl.codec.utf8String.toBits(SaltToHashDevices.toString(16)));
+    return {
+      "PasswordVerifier": base64PasswordVerifier,
+      "Salt": base64Salt
+    }
   }
 }
 
-function calculateSignature (hkdf, userPoolId, username, secretBlock, dateNow) {
+function calculateSignature(hkdf, userPoolId, username, secretBlock, dateNow) {
   var mac = new sjcl.misc.hmac(hkdf)
   mac.update(sjcl.codec.utf8String.toBits(userPoolId))
   mac.update(sjcl.codec.utf8String.toBits(username))
@@ -103,7 +131,7 @@ function calculateSignature (hkdf, userPoolId, username, secretBlock, dateNow) {
   return sjcl.codec.base64.fromBits(mac.digest())
 }
 
-function getNowString () {
+function getNowString() {
   var now = new Date()
   var weekDay = WEEK_NAMES[now.getUTCDay()]
   var month = MONTH_NAMES[now.getUTCMonth()]

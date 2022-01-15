@@ -108,12 +108,23 @@ export function signupConfirm (Username, ConfirmationCode, ForceAliasCreation) {
   })
 }
 
+export function confirmDevice (AccessToken, DeviceKey, DeviceName, DeviceGroupKey, Username) {
+  const userPoolId = process.env.CognitoUserPoolUsers.split('_')[1]
+  const srp = new SRPClient(userPoolId)
+  return call('AWSCognitoIdentityProviderService.ConfirmDevice', {
+        AccessToken: AccessToken, /* required */
+        DeviceKey: DeviceKey, /* required */
+        DeviceName: DeviceName,
+        DeviceSecretVerifierConfig: srp.generateDeviceVerifierConfig(DeviceGroupKey, Username)
+    })
+}
 ...
 ```
 
 # webpack
 
 Due to internal usage of [sjcl](https://github.com/bitwiseshiftleft/sjcl), in order not to bundle [crypto-browserify](https://github.com/crypto-browserify/crypto-browserify), add to config:
+
 ```js
 module.exports = {
   ...
